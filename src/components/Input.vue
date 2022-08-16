@@ -28,7 +28,7 @@ export default {
 
 <template>
     <div>
-        <label class="avenir-light text-blue">{{ title }}</label>
+        <label class="avenir-light text-blue">{{title}} <span class="text-danger">{{ title !== 'Arquivo App.deb3 (Opcional):' ? `*` : ''}}</span></label>
         <input ref="files" :accept="inputType == 'file' ? fileType : ''"
             :class="inputType == 'file' ? 'custom-file-input' : ''" :type="inputType" v-model="dataInput"
             placeholder="Escreva aqui..." />

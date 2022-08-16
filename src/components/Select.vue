@@ -23,7 +23,7 @@ export default {
 
 <template>
     <div>
-        <label class="avenir-light text-blue">{{ title }}</label>
+        <label class="avenir-light text-blue">{{title}} <span class="text-danger">*</span></label>
         <br>
         <select v-model="selected">
             <option disabled value="">Selecione uma opção</option>

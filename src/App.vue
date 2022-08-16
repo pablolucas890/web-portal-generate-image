@@ -11,6 +11,7 @@ export default {
   },
   data() {
     return {
+      isSendForm:false,
       preenchido: false,
       boards: ['RaspberryPI', 'OrangePI'],
       selectedBoard: '',
@@ -76,15 +77,15 @@ export default {
       </div>
       <div class="row">
         <div class="col-md-4">
-          <Select title="Selecione uma Placa: *" name="Boards" :options="boards"
+          <Select title="Selecione uma Placa: " name="Boards" :options="boards"
             @response="(selectedItem) => selectedBoard = selectedItem"></Select>
         </div>
         <div class="col-md-4">
-          <Select title="Selecione uma Versão: *" name="Versions" :options="versions"
+          <Select title="Selecione uma Versão: " name="Versions" :options="versions"
             @response="(selectedItem) => selectedVersion = selectedItem"></Select>
         </div>
         <div class="col-md-4">
-          <Input title="Nome da Imagem: *" inputType="text"
+          <Input title="Nome da Imagem: " inputType="text"
             @response="(imageNameChild) => imageName = imageNameChild"></Input>
         </div>
       </div>
@@ -92,7 +93,7 @@ export default {
         <h5 class="barlow-medium mb-3">Arquivos de usuário:</h5>
         <div class="row">
           <div class="col-md-4">
-            <Input title="Arquivo .db3: *" fileType=".db3" inputType="file" @response="(db3) => db3File = db3"></Input>
+            <Input title="Arquivo .db3: " fileType=".db3" inputType="file" @response="(db3) => db3File = db3"></Input>
             <span class="selected-text ">{{ db3File === null ? '' : (db3File.name === undefined ? '' : `Selecionado:
                           ${db3File.name}`)
             }}</span>
