@@ -26,6 +26,7 @@ export default {
             }
             if (sortKey) {
                 data = data.slice().sort((a, b) => {
+                    console.log(a)
                     a = a[sortKey]
                     b = b[sortKey]
                     return (a === b ? 0 : a > b ? 1 : -1) * order
@@ -35,8 +36,19 @@ export default {
         }
     },
     methods: {
+        padTo2Digits(num) {
+            return num.toString().padStart(2, '0');
+        },
+        formatDate(date) {
+            return [
+                date.substring(8,11),
+                date.substring(5,7),
+                date.substring(0,4),
+            ].join('/');
+        },
         sortBy(key) {
             this.sortKey = key
+            console.log(this.sortKey)
             this.sortOrders[key] = this.sortOrders[key] * -1
         },
         capitalize(str) {
@@ -61,13 +73,14 @@ export default {
             <tr v-for="entry in filteredData">
                 <td :class="key === 'status' ? 'text-center' : ''" v-for="key in columns">
                     <span v-if="entry[key] === 'download'"><a target="_blank"
-                            :href="`../../public/images/${entry['nome']}.img`">⏬</a></span>
+                            :href="`../../public/generated-images/${entry['nome']}.img`"><img src="../assets/download.png"
+                                width="30" alt="Download" class="download-icon" /></a></span>
                     <span v-else-if="entry[key] === 'loading'">
-                        <iframe src="https://giphy.com/embed/sSgvbe1m3n93G" width="30" height="30"
-                            frameBorder="0" class="giphy-embed" allowFullScreen>
+                        <iframe src="https://giphy.com/embed/sSgvbe1m3n93G" width="30" height="30" frameBorder="0"
+                            class="giphy-embed" allowFullScreen>
                         </iframe>
                     </span>
-                    <span v-else>{{ entry[key] }}</span>
+                    <span v-else>{{ key == 'data' ? formatDate(entry[key]) : entry[key] }}</span>
                 </td>
             </tr>
         </tbody>
@@ -128,5 +141,10 @@ th.active .arrow {
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
     border-top: 4px solid #fff;
+}
+
+.download-icon:hover {
+    transform: scale(1.25, 1.25);
+    transition-duration: 300ms;
 }
 </style>

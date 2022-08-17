@@ -3,6 +3,7 @@ import Container from './components/Container.vue'
 import Input from './components/Input.vue';
 import Select from './components/Select.vue';
 import DataTable from './components/DataTable.vue';
+
 export default {
   components: {
     Container,
@@ -14,23 +15,43 @@ export default {
     return {
       isSendForm: false,
       preenchido: false,
-      image_bases: ['RaspberryPI-02-03-2022', 'OrangePI-08-09-2021'], // Localizar da pasta
+      image_bases: [],
       selected_image_base: '',
       imageName: '',
       db3File: null,
       ovpnFile: null,
       Appdb3File: null,
       searchQuery: '',
-      gridColumns: ['nome', 'data', 'status', 'placa', 'versao'],
-      gridData: [ //localizar da pasta
-        { nome: 'OrangePI_Cliente_Lucas', data: '31/05/2022', status: 'loading', placa: 'OrangePI', versao: '4-5-33' },
-        { nome: 'RaspberryPI_Cliente_Lucas', data: '03/05/2022', status: 'download', placa: 'RaspberryPI', versao: '4-5-33' },
-        { nome: 'Teste', data: '04/05/2022', status: 'download', placa: 'RaspberryPI', versao: '4-5-33' },
-        { nome: 'Carlos', data: '31/07/2022', status: 'download', placa: 'RaspberryPI', versao: '1-2-33' }
-      ]
+      gridColumns: ['nome', 'data', 'status'],
+      gridData: []
     }
   },
   methods: {
+    padTo2Digits(num) {
+      return num.toString().padStart(2, '0');
+    },
+    formatDate(date) {
+      return [
+        date.getFullYear(),
+        this.padTo2Digits(date.getMonth() + 1),
+        this.padTo2Digits(date.getDate()),
+      ].join('-');
+    },
+    listImageBase() {
+      // Localizar Lista de Arquivos na pasta base-images
+      const images = ['RaspberryPI-02-03-2022', 'OrangePI-08-09-2021', 'Raspberry-01-01-2022'];
+      this.image_bases = images;
+    },
+    listGridData() {
+      // Localizar Lista de Arquivos na pasta generated-images
+      const gridData = [
+        { nome: 'OrangePI_Cliente_Lucas', data: '2022-05-31', status: 'download' },
+        { nome: 'RaspberryPI_Cliente_Lucas', data: '2022-05-17', status: 'download' },
+        { nome: 'Teste', data: '2022-05-04', status: 'download', placa: 'RaspberryPI' },
+        { nome: 'Carlos', data: '2022-07-31', status: 'download', placa: 'RaspberryPI' }
+      ]
+      this.gridData = gridData;
+    },
     todosPreenchidos() {
       if (this.selected_image_base === '' || this.imageName === '') {
         this.preenchido = false;
@@ -47,32 +68,21 @@ export default {
       }
     },
     generateImage() {
-      console.log('teste')
-      // async function listarArquivosDoDiretorio(diretorio, arquivos) {
-
-      //   if (!arquivos)
-      //     arquivos = [];
-
-      //   let listaDeArquivos = await fs.readdir(diretorio);
-      //   for (let k in listaDeArquivos) {
-      //     let stat = await fs.stat(diretorio + '/' + listaDeArquivos[k]);
-      //     if (stat.isDirectory())
-      //       await listarArquivosDoDiretorio(diretorio + '/' + listaDeArquivos[k], arquivos);
-      //     else
-      //       arquivos.push(diretorio + '/' + listaDeArquivos[k]);
-      //   }
-
-      //   return arquivos;
-
-      // }
-      // let arquivos = await listarArquivosDoDiretorio('./'); // coloque o caminho do seu diretorio
-      // console.log(arquivos);
       if (this.preenchido) {
-
-        //Gerar Imagem Concatenando as strings
-
+        // Concatenacao de valores para Salvar no Arquivo
+        let imageName = this.imageName + '|' + this.selected_image_base + '|' + this.db3File.name + '|' + this.ovpnFile.name;
+        this.Appdb3File === null ? (imageName = imageName) : (this.Appdb3File.name === undefined ? (imageName = imageName) : (imageName += '|' + this.Appdb3File.name))
+        imageName += '.img'
+        //Gerar Imagem com a string
+        //Fazer
+        // Se nao tiver arquivo na pasta
+        this.gridData.push({
+          nome: this.imageName,
+          data: this.formatDate(new Date()),
+          status: 'loading',
+        })
+        // Se tiver recarregar a pagina para listar como download
       } else {
-        // Aplicar animacao no componete
         if (this.$refs.alert.className.includes('2')) {
           this.$refs.alert.className = 'visible visible-transform'
         } else {
@@ -80,7 +90,11 @@ export default {
         }
       }
     },
-  }
+  },
+  created() {
+    this.listImageBase()
+    this.listGridData()
+  },
 }
 </script>
 
