@@ -11,7 +11,7 @@ export default {
   },
   data() {
     return {
-      isSendForm:false,
+      isSendForm: false,
       preenchido: false,
       boards: ['RaspberryPI', 'OrangePI'],
       selectedBoard: '',
@@ -40,7 +40,16 @@ export default {
       }
     },
     generateImage() {
-      alert('Valores Selecionados:\n\n' + this.selectedBoard + '\n' + this.imageName + '\n' + this.selectedVersion + '\n' + this.db3File.name + '\n' + this.ovpnFile.name + '\n' + this.Appdb3File.name)
+      if (this.preenchido) {
+        alert('Valores Selecionados:\n\n' + this.selectedBoard + '\n' + this.imageName + '\n' + this.selectedVersion + '\n' + this.db3File.name + '\n' + this.ovpnFile.name + '\n' + this.Appdb3File.name)
+      } else {
+        // Aplicar animacao no componete
+        if (this.$refs.alert.className.includes('2')) {
+          this.$refs.alert.className = 'visible visible-transform'
+        } else {
+          this.$refs.alert.className = 'visible visible-transform2'
+        }
+      }
     },
   },
   watch: {
@@ -115,8 +124,8 @@ export default {
         </div>
       </Container>
       <div>
-        <button @click="generateImage" :disabled="!preenchido">Gerar Imagem</button>
-        <span :class="preenchido ? 'invisible' : 'visible'">
+        <button @click="generateImage">Gerar Imagem</button>
+        <span ref="alert" :class="preenchido ? 'invisible' : 'visible'">
           Preencha todos os campos *
         </span>
       </div>
@@ -135,6 +144,10 @@ export default {
 
 .invisible {
   visibility: true;
+  font-family: barlow-medium;
+  color: red;
+  font-size: .8em;
+  margin-left: 1em;
 }
 
 .visible {
@@ -143,6 +156,52 @@ export default {
   color: red;
   font-size: .8em;
   margin-left: 1em;
+}
+
+.visible-transform {
+  animation-name: slidein;
+  animation-duration: 0.4s;
+  animation-iteration-count: 2;
+}
+
+.visible-transform2 {
+  animation-name: slidein2;
+  animation-duration: 0.4s;
+  animation-iteration-count: 2;
+}
+
+@keyframes slidein {
+  0% {
+    opacity: 0;
+    font-size: .8em;
+  }
+
+  50% {
+    opacity: 1;
+    font-size: 1em;
+  }
+
+  100% {
+    opacity: 0;
+    font-size: .8em;
+  }
+}
+
+@keyframes slidein2 {
+  0% {
+    opacity: 0;
+    font-size: .8em;
+  }
+
+  50% {
+    opacity: 1;
+    font-size: 1em;
+  }
+
+  100% {
+    opacity: 0;
+    font-size: .8em;
+  }
 }
 
 .title {
