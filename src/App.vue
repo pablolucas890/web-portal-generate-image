@@ -2,30 +2,37 @@
 import Container from './components/Container.vue'
 import Input from './components/Input.vue';
 import Select from './components/Select.vue';
-
+import DataTable from './components/DataTable.vue';
 export default {
   components: {
     Container,
     Input,
-    Select
+    Select,
+    DataTable
   },
   data() {
     return {
       isSendForm: false,
       preenchido: false,
-      boards: ['RaspberryPI', 'OrangePI'],
-      selectedBoard: '',
-      versions: ['1-2-33', '4-5-33'],
-      selectedVersion: '',
+      image_bases: ['RaspberryPI-02-03-2022', 'OrangePI-08-09-2021'], // Localizar da pasta
+      selected_image_base: '',
       imageName: '',
       db3File: null,
       ovpnFile: null,
-      Appdb3File: null
+      Appdb3File: null,
+      searchQuery: '',
+      gridColumns: ['nome', 'data', 'status', 'placa', 'versao'],
+      gridData: [ //localizar da pasta
+        { nome: 'OrangePI_Cliente_Lucas', data: '31/05/2022', status: 'loading', placa: 'OrangePI', versao: '4-5-33' },
+        { nome: 'RaspberryPI_Cliente_Lucas', data: '03/05/2022', status: 'download', placa: 'RaspberryPI', versao: '4-5-33' },
+        { nome: 'Teste', data: '04/05/2022', status: 'download', placa: 'RaspberryPI', versao: '4-5-33' },
+        { nome: 'Carlos', data: '31/07/2022', status: 'download', placa: 'RaspberryPI', versao: '1-2-33' }
+      ]
     }
   },
   methods: {
     todosPreenchidos() {
-      if (this.selectedBoard === '' || this.selectedVersion === '' || this.imageName === '') {
+      if (this.selected_image_base === '' || this.imageName === '') {
         this.preenchido = false;
       } else {
         if (this.db3File === null || this.ovpnFile === null) {
@@ -40,8 +47,30 @@ export default {
       }
     },
     generateImage() {
+      console.log('teste')
+      // async function listarArquivosDoDiretorio(diretorio, arquivos) {
+
+      //   if (!arquivos)
+      //     arquivos = [];
+
+      //   let listaDeArquivos = await fs.readdir(diretorio);
+      //   for (let k in listaDeArquivos) {
+      //     let stat = await fs.stat(diretorio + '/' + listaDeArquivos[k]);
+      //     if (stat.isDirectory())
+      //       await listarArquivosDoDiretorio(diretorio + '/' + listaDeArquivos[k], arquivos);
+      //     else
+      //       arquivos.push(diretorio + '/' + listaDeArquivos[k]);
+      //   }
+
+      //   return arquivos;
+
+      // }
+      // let arquivos = await listarArquivosDoDiretorio('./'); // coloque o caminho do seu diretorio
+      // console.log(arquivos);
       if (this.preenchido) {
-        alert('Valores Selecionados:\n\n' + this.selectedBoard + '\n' + this.imageName + '\n' + this.selectedVersion + '\n' + this.db3File.name + '\n' + this.ovpnFile.name + '\n' + this.Appdb3File.name)
+
+        //Gerar Imagem Concatenando as strings
+
       } else {
         // Aplicar animacao no componete
         if (this.$refs.alert.className.includes('2')) {
@@ -51,24 +80,7 @@ export default {
         }
       }
     },
-  },
-  watch: {
-    selectedBoard() {
-      this.todosPreenchidos()
-    },
-    selectedVersion() {
-      this.todosPreenchidos()
-    },
-    imageName() {
-      this.todosPreenchidos()
-    },
-    db3File() {
-      this.todosPreenchidos()
-    },
-    ovpnFile() {
-      this.todosPreenchidos()
-    }
-  },
+  }
 }
 </script>
 
@@ -85,16 +97,13 @@ export default {
         </div>
       </div>
       <div class="row">
-        <div class="col-md-4">
-          <Select title="Selecione uma Placa: " name="Boards" :options="boards"
-            @response="(selectedItem) => selectedBoard = selectedItem"></Select>
+        <div class="col-md-6">
+          <Select @click="this.todosPreenchidos" @change="this.todosPreenchidos()" title="Selecione uma Imagem Base: "
+            name="Boards" :options="image_bases"
+            @response="(selectedItem) => selected_image_base = selectedItem"></Select>
         </div>
-        <div class="col-md-4">
-          <Select title="Selecione uma Versão: " name="Versions" :options="versions"
-            @response="(selectedItem) => selectedVersion = selectedItem"></Select>
-        </div>
-        <div class="col-md-4">
-          <Input title="Nome da Imagem: " inputType="text"
+        <div class="col-md-6">
+          <Input @change="this.todosPreenchidos()" title="Nome da Imagem: " inputType="text"
             @response="(imageNameChild) => imageName = imageNameChild"></Input>
         </div>
       </div>
@@ -102,13 +111,14 @@ export default {
         <h5 class="barlow-medium mb-3">Arquivos de usuário:</h5>
         <div class="row">
           <div class="col-md-4">
-            <Input title="Arquivo .db3: " fileType=".db3" inputType="file" @response="(db3) => db3File = db3"></Input>
+            <Input @change="this.todosPreenchidos()" title="Arquivo .db3: " fileType=".db3" inputType="file"
+              @response="(db3) => db3File = db3"></Input>
             <span class="selected-text ">{{ db3File === null ? '' : (db3File.name === undefined ? '' : `Selecionado:
                           ${db3File.name}`)
             }}</span>
           </div>
           <div class="col-md-4">
-            <Input title="Arquivo .ovpn:" fileType=".ovpn" inputType="file"
+            <Input @change="this.todosPreenchidos()" title="Arquivo .ovpn:" fileType=".ovpn" inputType="file"
               @response="(ovpn) => ovpnFile = ovpn"></Input>
             <span class="selected-text ">{{ ovpnFile === null ? '' : (ovpnFile.name === undefined ? '' : `Selecionado:
                           ${ovpnFile.name}`)
@@ -130,10 +140,22 @@ export default {
         </span>
       </div>
     </Container>
+    <Container class="table-container">
+      <form id="search">
+        <h5 class="search">Pesquisar:</h5> <input class="search-input" name="query" v-model="searchQuery">
+      </form>
+      <DataTable :data="gridData" :columns="gridColumns" :filter-key="searchQuery">
+      </DataTable>
+    </Container>
   </Container>
 </template>
 <style>
 .first-container {
+  padding: 2em;
+}
+
+.table-container {
+  margin-top: 2em;
   padding: 2em;
 }
 
@@ -156,6 +178,10 @@ export default {
   color: red;
   font-size: .8em;
   margin-left: 1em;
+}
+
+.search-input {
+  width: 100% !important;
 }
 
 .visible-transform {

@@ -9,6 +9,7 @@
   "dependencies": {
     "bootstrap": "^5.2.0",
     "bootstrap-vue": "^2.22.0",
+    "fs": "^0.0.1-security",
     "vue": "^3.2.37"
   },
   "devDependencies": {
