@@ -95,10 +95,29 @@ export default {
         this.imageName = this.imageName.replaceAll('/', '-')
         this.imageName = this.imageName.replaceAll('\\', '-')
         this.imageName = this.imageName.replaceAll(']', '-')
-        // Concatenacao de valores para Salvar no Arquivo
+
         let imageName = this.imageName + ']' + this.formatDate(new Date()) + ']' + this.selected_image_base + ']' + this.db3File.name + ']' + this.ovpnFile.name;
         this.Appdb3File === null ? (imageName = imageName) : (this.Appdb3File.name === undefined ? (imageName = imageName) : (imageName += ']' + this.Appdb3File.name))
         imageName += '].img'
+
+        // Fazer um POST para a rota upload para salvar os arquivos na pasta temp
+        /*
+
+        const headers2 = new Headers();
+        headers2.set('Authorization', 'Basic ' + btoa(username + ":" + password));
+        //setar o username e senha
+        fetch(`http://${dataJson.bind}:${dataJson.port}/upload`, {
+          Method: 'POST',
+          Headers: {
+            Accept: 'application.json',
+            'Content-Type': 'multipart/form-data'
+          },
+          headers: headers2,
+          Body: this.db3File,
+          Cache: 'default'
+        })
+        */
+
         fetch(`http://${dataJson.bind}:${dataJson.port}/create-image?image_name=${imageName}`, {
           method: 'GET',
           headers: headers,
