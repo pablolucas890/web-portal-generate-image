@@ -1,9 +1,17 @@
 <script>
+import * as dataJson from '../../cfg.json';
+
+const username = dataJson.username
+const password = dataJson.password
+const headers = new Headers();
+headers.set('Authorization', 'Basic ' + btoa(username + ":" + password));
+
+
 export default {
     props: {
         data: Array,
         columns: Array,
-        filterKey: String
+        filterKey: String,
     },
     data() {
         return {
@@ -26,7 +34,6 @@ export default {
             }
             if (sortKey) {
                 data = data.slice().sort((a, b) => {
-                    console.log(a)
                     a = a[sortKey]
                     b = b[sortKey]
                     return (a === b ? 0 : a > b ? 1 : -1) * order
@@ -41,19 +48,18 @@ export default {
         },
         formatDate(date) {
             return [
-                date.substring(8,11),
-                date.substring(5,7),
-                date.substring(0,4),
+                date.substring(8, 11),
+                date.substring(5, 7),
+                date.substring(0, 4),
             ].join('/');
         },
         sortBy(key) {
             this.sortKey = key
-            console.log(this.sortKey)
             this.sortOrders[key] = this.sortOrders[key] * -1
         },
         capitalize(str) {
             return str.charAt(0).toUpperCase() + str.slice(1)
-        }
+        },
     }
 }
 </script>
@@ -67,20 +73,29 @@ export default {
                     <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'">
                     </span>
                 </th>
+                <th>
+                    Deletar
+                </th>
             </tr>
         </thead>
         <tbody>
             <tr v-for="entry in filteredData">
                 <td :class="key === 'status' ? 'text-center' : ''" v-for="key in columns">
-                    <span v-if="entry[key] === 'download'"><a target="_blank"
-                            :href="`../../public/generated-images/${entry['nome']}.img`"><img src="../assets/download.png"
-                                width="30" alt="Download" class="download-icon" /></a></span>
+                    <span v-if="entry[key] === 'download'"><a
+                            :href="`download?imgName=${entry['nome']}]${entry['data']}]${entry['imagem']}]${entry['db3']}]${entry['ovpn']}]${entry['appdb3']}${entry['appdb3'] == '' ? '' : ']'}.img`">
+                            <img src="../assets/download.png" width="30" alt="Download"
+                                class="download-icon" /></a></span>
                     <span v-else-if="entry[key] === 'loading'">
                         <iframe src="https://giphy.com/embed/sSgvbe1m3n93G" width="30" height="30" frameBorder="0"
                             class="giphy-embed" allowFullScreen>
                         </iframe>
                     </span>
                     <span v-else>{{ key == 'data' ? formatDate(entry[key]) : entry[key] }}</span>
+                </td>
+                <td class="text-center">
+                    <a
+                        :href="`delete?imgName=${entry['nome']}]${entry['data']}]${entry['imagem']}]${entry['db3']}]${entry['ovpn']}]${entry['appdb3']}${entry['appdb3'] == '' ? '' : ']'}.img`">
+                        <img src="../assets/delete.png" width="30" alt="Download" class="download-icon" /></a>
                 </td>
             </tr>
         </tbody>
@@ -93,8 +108,8 @@ table {
     border: 2px solid #0091ea;
     border-radius: 3px;
     background-color: #fff;
-    width: 100%;
     margin-top: 1em;
+    width: 100%;
 }
 
 th {
