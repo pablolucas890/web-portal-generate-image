@@ -13,14 +13,4 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  lintOnSave: true,
-  configureWebpack: config => {
-    return {
-      plugins: [
-        new webpack.DefinePlugin({
-          'somevar': someFileContents,
-        })
-      ]
-    }
-  },
 })

@@ -1,8 +1,8 @@
 <script>
-import Container from './components/Container.vue'
-import Input from './components/Input.vue';
-import Select from './components/Select.vue';
-import DataTable from './components/DataTable.vue';
+import Container from './Container.vue'
+import Input from './Input.vue';
+import Select from './Select.vue';
+import DataTable from './DataTable.vue';
 
 export default {
   components: {
@@ -45,7 +45,7 @@ export default {
     listGridData() {
       // Localizar Lista de Arquivos na pasta generated-images
       const gridData = [
-        { nome: 'OrangePI_Cliente_Lucas', data: '2022-05-31', status: 'download' },
+        { nome: 'OrangePI_Cliente_Lucas', data: '2022-05-31', status: 'loading' },
         { nome: 'RaspberryPI_Cliente_Lucas', data: '2022-05-17', status: 'download' },
         { nome: 'Teste', data: '2022-05-04', status: 'download', placa: 'RaspberryPI' },
         { nome: 'Carlos', data: '2022-07-31', status: 'download', placa: 'RaspberryPI' }
@@ -107,7 +107,7 @@ export default {
         </div>
         <div class="col-0 col-md-2"></div>
         <div class="col-12 col-md-3 text-center">
-          <img src="./assets/logo.png" width="200" class="float-right" alt="Controllar">
+          <img src="../assets/logo.png" width="200" class="float-right" alt="Controllar">
         </div>
       </div>
       <div class="row">
