@@ -1,2 +1,6 @@
 *.img
 node_modules
+dist
+public/mounted-imgs
+*.ovpn
+*.db3

@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const fs = require('fs')
 const { exec } = require('child_process');
 const path = require("path");
+const multer = require('multer');
 
 const { conf } = require('./utils.js')
 
@@ -48,15 +49,36 @@ app.get('/list-base-images', logRequest, async (request, response) => {
     return response.json(filenames);
 });
 app.get('/list-generated-images', logRequest, async (request, response) => {
-
     const filenames = fs.readdirSync('./public/generated-images')
     return response.json(filenames);
 });
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/temp/')
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    }
+});
+const upload = multer({ storage });
+app.post('/upload', upload.single('foto'), async (request, response) => {
+    return response.json({
+        message: "recebido com sucesso"
+    })
+});
 app.get('/create-image', logRequest, async (request, response) => {
-    let message
+    const imgFullName = request.query.image_name;
+    const db3FileName = imgFullName.split(']')[3]
+    const ovpnFileName = imgFullName.split(']')[4]
+    const appdb3FileName = imgFullName.split(']')[5] == '.img' ? '' : imgFullName.split(']')[5]
+
+    //Chamar rota de loalizacao de arquivo passando o nome
     try {
+        /*
         //Criar imagem
-        exec("ls -la", (error, stdout, stderr) => {
+        //Procurar Dinamicamente
+        //Fazer Ofsset dinamico
+        exec("sudo mount -t ext4 -o rw,sync,offset=1999872 public/base-images/image-orangepi-debian.img public/mounted-imgs", (error, stdout, stderr) => {
             if (error) {
                 console.log(`error: ${error.message}`);
                 return;
@@ -65,14 +87,27 @@ app.get('/create-image', logRequest, async (request, response) => {
                 console.log(`stderr: ${stderr}`);
                 return;
             }
-            console.log(`stdout: ${stdout}`);
+            //executar cp
+        });
+        // Desmonstando Imagem
+        exec("sudo umount public/mounted-imgs", (error, stdout, stderr) => {
+            if (error) {
+                console.log(`error: ${error.message}`);
+                return;
+            }
+            if (stderr) {
+                console.log(`stderr: ${stderr}`);
+                return;
+            }
         });
         //Fim Criar Imagem
-        const filenames = fs.writeFileSync(`./public/generated-images/${request.query.image_name}`, "")
+        */
+        const filenames = fs.writeFileSync(`./public/generated-images/${imgFullName}`, "")
         message = "ok"
     } catch (error) {
         message = "erro"
     }
+    //Deletar todos os arquivos temporarios
     return response.json({
         message,
     });
