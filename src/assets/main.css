@@ -26,8 +26,8 @@ body{
   max-width: 1280px;
   margin: 0 auto;
   padding: 5rem;
-  padding-left: 8rem;
-  padding-right: 8rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
   font-weight: normal;
 }
 @media (max-width: 766px) {

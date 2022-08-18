@@ -3,6 +3,13 @@ import Container from './Container.vue'
 import Input from './Input.vue';
 import Select from './Select.vue';
 import DataTable from './DataTable.vue';
+import * as dataJson from '../../cfg.json';
+
+const username = dataJson.username
+const password = dataJson.password
+const headers = new Headers();
+headers.set('Authorization', 'Basic ' + btoa(username + ":" + password));
+
 
 export default {
   components: {
@@ -22,7 +29,7 @@ export default {
       ovpnFile: null,
       Appdb3File: null,
       searchQuery: '',
-      gridColumns: ['nome', 'data', 'status'],
+      gridColumns: ['nome', 'data', 'status', 'imagem', 'db3', 'ovpn', 'appdb3'],
       gridData: []
     }
   },
@@ -38,19 +45,34 @@ export default {
       ].join('-');
     },
     listImageBase() {
-      // Localizar Lista de Arquivos na pasta base-images
-      const images = ['RaspberryPI-02-03-2022', 'OrangePI-08-09-2021', 'Raspberry-01-01-2022'];
-      this.image_bases = images;
+      fetch(`http://${dataJson.bind}:${dataJson.port}/list-base-images`, {
+        method: 'GET',
+        headers: headers,
+      }).then(response => response.json())
+        .then(json => {
+          this.image_bases = json
+        });
     },
     listGridData() {
-      // Localizar Lista de Arquivos na pasta generated-images
-      const gridData = [
-        { nome: 'OrangePI_Cliente_Lucas', data: '2022-05-31', status: 'loading' },
-        { nome: 'RaspberryPI_Cliente_Lucas', data: '2022-05-17', status: 'download' },
-        { nome: 'Teste', data: '2022-05-04', status: 'download', placa: 'RaspberryPI' },
-        { nome: 'Carlos', data: '2022-07-31', status: 'download', placa: 'RaspberryPI' }
-      ]
-      this.gridData = gridData;
+      fetch(`http://${dataJson.bind}:${dataJson.port}/list-generated-images`, {
+        method: 'GET',
+        headers: headers,
+      }).then(response => response.json())
+        .then(json => {
+          for (let i = 0; i < json.length; i++) {
+            const element = json[i];
+            const celGrid = {
+              nome: element.split(']')[0],
+              data: element.split(']')[1],
+              status: 'download',
+              imagem: element.split(']')[2],
+              db3: element.split(']')[3],
+              ovpn: element.split(']')[4],
+              appdb3: element.split(']')[5] === '.img' ? '' : element.split(']')[5],
+            }
+            this.gridData.push(celGrid)
+          }
+        });
     },
     todosPreenchidos() {
       if (this.selected_image_base === '' || this.imageName === '') {
@@ -69,19 +91,26 @@ export default {
     },
     generateImage() {
       if (this.preenchido) {
+        this.imageName = this.imageName.replaceAll(' ', '-')
+        this.imageName = this.imageName.replaceAll('/', '-')
+        this.imageName = this.imageName.replaceAll('\\', '-')
+        this.imageName = this.imageName.replaceAll(']', '-')
         // Concatenacao de valores para Salvar no Arquivo
-        let imageName = this.imageName + '|' + this.selected_image_base + '|' + this.db3File.name + '|' + this.ovpnFile.name;
-        this.Appdb3File === null ? (imageName = imageName) : (this.Appdb3File.name === undefined ? (imageName = imageName) : (imageName += '|' + this.Appdb3File.name))
-        imageName += '.img'
-        //Gerar Imagem com a string
-        //Fazer
-        // Se nao tiver arquivo na pasta
-        this.gridData.push({
-          nome: this.imageName,
-          data: this.formatDate(new Date()),
-          status: 'loading',
-        })
-        // Se tiver recarregar a pagina para listar como download
+        let imageName = this.imageName + ']' + this.formatDate(new Date()) + ']' + this.selected_image_base + ']' + this.db3File.name + ']' + this.ovpnFile.name;
+        this.Appdb3File === null ? (imageName = imageName) : (this.Appdb3File.name === undefined ? (imageName = imageName) : (imageName += ']' + this.Appdb3File.name))
+        imageName += '].img'
+        fetch(`http://${dataJson.bind}:${dataJson.port}/create-image?image_name=${imageName}`, {
+          method: 'GET',
+          headers: headers,
+        }).then(response => response.json())
+          .then(json => {
+            json.message === 'ok'
+              ?
+              alert('Arquivo Criado com Sucesso')
+              :
+              alert('Erro ao criar arquivo')
+          });
+        window.location.reload();
       } else {
         if (this.$refs.alert.className.includes('2')) {
           this.$refs.alert.className = 'visible visible-transform'
@@ -90,6 +119,11 @@ export default {
         }
       }
     },
+  },
+  watch: {
+    selected_image_base() {
+      this.todosPreenchidos();
+    }
   },
   created() {
     this.listImageBase()
@@ -112,7 +146,7 @@ export default {
       </div>
       <div class="row">
         <div class="col-md-6">
-          <Select @click="this.todosPreenchidos" @change="this.todosPreenchidos()" title="Selecione uma Imagem Base: "
+          <Select @click="this.todosPreenchidos()" @change="this.todosPreenchidos()" title="Selecione uma Imagem Base: "
             name="Boards" :options="image_bases"
             @response="(selectedItem) => selected_image_base = selectedItem"></Select>
         </div>
