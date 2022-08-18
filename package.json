@@ -1,13 +1,14 @@
 {
   "name": "web-portal-generate-image-express",
   "version": "1.0.0",
-  "description": "",
+  "description": "This template should help get you started developing with Vue 3 in Vite.",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev-server": "nodemon",
     "build": "vite build",
-    "dev-front": "vite"
+    "dev-front": "vite",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,7 @@
     "body-parser": "^1.20.0",
     "bootstrap": "^5.2.0",
     "bootstrap-vue": "^2.22.0",
+    "child_process": "^1.0.2",
     "cors": "^2.8.5",
     "express": "^4.18.1",
     "fs": "^0.0.1-security",
@@ -27,7 +29,16 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^3.0.3",
+    "mocha": "^10.0.0",
     "nodemon": "^2.0.19",
     "vite": "^3.0.8"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pablolucas890/web-portal-generate-image.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pablolucas890/web-portal-generate-image/issues"
+  },
+  "homepage": "https://github.com/pablolucas890/web-portal-generate-image#readme"
 }

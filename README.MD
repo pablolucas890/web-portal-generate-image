@@ -32,3 +32,17 @@ npm run build && npm run dev-server
 lets to http://localhost:3333
 user:admin
 password:admin
+
+
+### cfg config
+
+{
+    "port": 3333,
+    "bind": "127.0.0.1",
+    "servers": [],
+    "username": "admin",
+    "password": "admin",
+    "web": {
+        "dateFormat": "HH:mm:ss - DD.MM.YY"
+    }
+}

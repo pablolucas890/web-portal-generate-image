@@ -3,6 +3,8 @@ const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser')
 const fs = require('fs')
+const { exec } = require('child_process');
+const path = require("path");
 
 const { conf } = require('./utils.js')
 
@@ -53,6 +55,19 @@ app.get('/list-generated-images', logRequest, async (request, response) => {
 app.get('/create-image', logRequest, async (request, response) => {
     let message
     try {
+        //Criar imagem
+        exec("ls -la", (error, stdout, stderr) => {
+            if (error) {
+                console.log(`error: ${error.message}`);
+                return;
+            }
+            if (stderr) {
+                console.log(`stderr: ${stderr}`);
+                return;
+            }
+            console.log(`stdout: ${stdout}`);
+        });
+        //Fim Criar Imagem
         const filenames = fs.writeFileSync(`./public/generated-images/${request.query.image_name}`, "")
         message = "ok"
     } catch (error) {
