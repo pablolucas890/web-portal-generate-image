@@ -198,7 +198,7 @@ export default {
             }}</span>
           </div>
           <div class="col-md-4">
-            <Input title="Arquivo App.deb3 (Opcional):" fileType=".db3" inputType="file"
+            <Input title="Arquivo App.db3 (Opcional):" fileType=".db3" inputType="file"
               @response="(appdb3) => Appdb3File = appdb3"></Input>
             <span class="selected-text ">{{ Appdb3File === null ? '' : (Appdb3File.name === undefined ? '' :
                 `Selecionado: ${Appdb3File.name}`)
