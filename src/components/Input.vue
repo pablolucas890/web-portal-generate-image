@@ -28,7 +28,11 @@ export default {
 
 <template>
     <div>
-        <label class="avenir-light text-blue">{{title}} <span class="text-danger">{{ title !== 'Arquivo App.deb3 (Opcional):' ? `*` : ''}}</span></label>
+        <label class="avenir-light text-blue">{{ title }}
+            <span class="text-danger">{{ title !== 'Arquivo App.deb3 (Opcional):' ? `*` : '' }}
+            </span>
+        </label>
+        <br>
         <input ref="files" :accept="inputType == 'file' ? fileType : ''"
             :class="inputType == 'file' ? 'custom-file-input' : ''" :type="inputType" v-model="dataInput"
             placeholder="Escreva aqui..." />
@@ -72,11 +76,13 @@ input {
     color: #0091ea;
     cursor: pointer;
 }
+
 .custom-file-input:hover::before {
     background-color: #0091ea;
     transition-duration: 300ms;
     color: white;
 }
+
 .custom-file-input:hover {
     background-color: #0091ea;
     transition-duration: 300ms;

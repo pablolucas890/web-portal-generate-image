@@ -33,11 +33,6 @@ app.use('/', express.static(`${__dirname}/dist`))
 app.use(bodyParser.json())
 
 function logRequest(request, response, next) {
-    const method = request.method;
-    const url = request.url;
-
-    console.log(method + '  --  ' + url);
-
     return next(); //proximo middleware
 }
 
@@ -58,69 +53,49 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname)
-    }
+    },
 });
-const upload = multer({ storage });
-app.post('/upload', upload.single('foto'), async (request, response) => {
+const upload = multer({ storage, limits: { fileSize: 1000000 } });
+app.post('/upload', upload.array('files', 3), (request, response) => {
     return response.json({
-        message: "recebido com sucesso"
+        message: "Recebido com sucesso"
     })
 });
-app.get('/create-image', logRequest, async (request, response) => {
-    const imgFullName = request.query.image_name;
-    const db3FileName = imgFullName.split(']')[3]
-    const ovpnFileName = imgFullName.split(']')[4]
-    const appdb3FileName = imgFullName.split(']')[5] == '.img' ? '' : imgFullName.split(']')[5]
+function criaImagem(imgName, imgFullName) {
+    exec(`sudo ./exec.sh ${imgName} ${imgFullName}`, (error, stdout, stderr) => {
+        if (error) {
+            console.log(`Erro: ${error.message}`);
+        }
+        if (stderr) {
+            console.log(`stderr: ${stderr}`);
+        }
+        console.log('Stdout:', stdout)
+        return;
+    });
+}
+function montaImagem(imgFullName, db3FileName, ovpnFileName, appdb3FileName) {
 
-    //Chamar rota de loalizacao de arquivo passando o nome
-    try {
-        /*
-        //Criar imagem
-        //Procurar Dinamicamente
-        //Fazer Ofsset dinamico
-        exec("sudo mount -t ext4 -o rw,sync,offset=1999872 public/base-images/image-orangepi-debian.img public/mounted-imgs", (error, stdout, stderr) => {
-            if (error) {
-                console.log(`error: ${error.message}`);
-                return;
-            }
-            if (stderr) {
-                console.log(`stderr: ${stderr}`);
-                return;
-            }
-            //executar cp
-        });
-        // Desmonstando Imagem
-        exec("sudo umount public/mounted-imgs", (error, stdout, stderr) => {
-            if (error) {
-                console.log(`error: ${error.message}`);
-                return;
-            }
-            if (stderr) {
-                console.log(`stderr: ${stderr}`);
-                return;
-            }
-        });
-        //Fim Criar Imagem
-        */
-        const filenames = fs.writeFileSync(`./public/generated-images/${imgFullName}`, "")
-        message = "ok"
-    } catch (error) {
-        message = "erro"
-    }
-    //Deletar todos os arquivos temporarios
+}
+app.get('/create-image', logRequest, (request, response) => {
+    const imgFullName = request.query.image_name;
+    const imgName = imgFullName.split(']')[2]
+    // Fazer Loading
+    // Fazer Carregamento do DataTable de 5 em 5 segundos
+    criaImagem(imgName, imgFullName);
+
+    message = "ok"
     return response.json({
         message,
     });
 });
 app.get('/download', logRequest, async (request, response) => {
     const imgName = request.query.imgName;
-    const file = `./public/generated-images/${imgName}`;
+    const file = `./public/generated-images/${imgName}.gz`;
     response.download(file); // Set disposition and send it.
     return response;
 });
 app.get('/delete', logRequest, async (request, response) => {
-    console.log(request)
-    const filenames = fs.unlinkSync(`./public/generated-images/${request.query.imgName}`, "")
+    const filenames = fs.unlinkSync(`./public/generated-images/${request.query.imgName}.gz`, "")
     return response.redirect('/');
 });
 app.listen({ host: conf.get('bind'), port: conf.get('port'), exclusive: true })

@@ -46,3 +46,6 @@ password:admin
         "dateFormat": "HH:mm:ss - DD.MM.YY"
     }
 }
+
+
+instalar o expect

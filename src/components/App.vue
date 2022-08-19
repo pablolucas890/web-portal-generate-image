@@ -4,6 +4,7 @@ import Input from './Input.vue';
 import Select from './Select.vue';
 import DataTable from './DataTable.vue';
 import * as dataJson from '../../cfg.json';
+import axios from 'axios'
 
 const username = dataJson.username
 const password = dataJson.password
@@ -68,10 +69,35 @@ export default {
               imagem: element.split(']')[2],
               db3: element.split(']')[3],
               ovpn: element.split(']')[4],
-              appdb3: element.split(']')[5] === '.img' ? '' : element.split(']')[5],
+              appdb3: element.split(']')[5] === '.img.gz' ? '' : element.split(']')[5],
             }
             this.gridData.push(celGrid)
           }
+        });
+    },
+    sendFiles() {
+      let files = new FormData();
+      files.append('files', this.db3File)
+      files.append('files', this.ovpnFile)
+      if (this.Appdb3File !== null) {
+        if (this.Appdb3File !== undefined) {
+          files.append('files', this.Appdb3File)
+        }
+      }
+      axios.post(`http://${dataJson.bind}:${dataJson.port}/upload`, files, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        auth: {
+          username: username,
+          password: password
+        }
+      })
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
         });
     },
     todosPreenchidos() {
@@ -100,34 +126,14 @@ export default {
         this.Appdb3File === null ? (imageName = imageName) : (this.Appdb3File.name === undefined ? (imageName = imageName) : (imageName += ']' + this.Appdb3File.name))
         imageName += '].img'
 
-        // Fazer um POST para a rota upload para salvar os arquivos na pasta temp
-        /*
-
-        const headers2 = new Headers();
-        headers2.set('Authorization', 'Basic ' + btoa(username + ":" + password));
-        //setar o username e senha
-        fetch(`http://${dataJson.bind}:${dataJson.port}/upload`, {
-          Method: 'POST',
-          Headers: {
-            Accept: 'application.json',
-            'Content-Type': 'multipart/form-data'
-          },
-          headers: headers2,
-          Body: this.db3File,
-          Cache: 'default'
-        })
-        */
+        this.sendFiles()
 
         fetch(`http://${dataJson.bind}:${dataJson.port}/create-image?image_name=${imageName}`, {
           method: 'GET',
           headers: headers,
         }).then(response => response.json())
           .then(json => {
-            json.message === 'ok'
-              ?
-              alert('Arquivo Criado com Sucesso')
-              :
-              alert('Erro ao criar arquivo')
+            //Colocar alert de sucesso ou erro
           });
         window.location.reload();
       } else {
@@ -144,7 +150,7 @@ export default {
       this.todosPreenchidos();
     }
   },
-  created() {
+  async created() {
     this.listImageBase()
     this.listGridData()
   },
