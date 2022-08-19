@@ -4,6 +4,7 @@ set -e
 
 IMG_BASE=$1
 IMG_FINAL=$2
+IMG_FINAL=$2
 
 echo "Inicio da Copia da Imagem"
 cp public/base-images/$IMG_BASE public/mount-temp/$IMG_FINAL
