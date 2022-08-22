@@ -4,16 +4,15 @@ set -e
 
 IMG_BASE=$1
 IMG_FINAL=$2
-IMG_FINAL=$2
+OFFSET=$3
 
+echo "Criando Arquivo Temporario"
+touch public/generated-images/loading-$IMG_FINAL.gz
 echo "Inicio da Copia da Imagem"
 cp public/base-images/$IMG_BASE public/mount-temp/$IMG_FINAL
 echo "Fim da Copia dos Arquivos"
 echo "Inicio do Mount"
-# Fazer Ofsset Dinamico
-# 4194304
-# 1999872
-mount -t ext4 -o rw,sync,offset=4194304 public/mount-temp/$IMG_FINAL public/mounted-img
+mount -t ext4 -o rw,sync,offset=$OFFSET public/mount-temp/$IMG_FINAL public/mounted-img
 echo "Fim do Mount"
 echo "Inicio da Copia dos Arquivos"
 cp public/temp/*.db3 public/temp/*.ovpn public/mounted-img/controllar
@@ -43,8 +42,10 @@ gzip public/mount-temp/$IMG_FINAL
 echo "Fim da Comprecao"
 echo "Inicio da Copia da Imagem para Download"
 cp public/mount-temp/$IMG_FINAL.gz public/generated-images/$IMG_FINAL.gz
-echo "Inicio da Copia da Imagem para Download"
+echo "Fim da Copia da Imagem para Download"
 echo "Inicio da Remocao dos arquivos temporarios"
 rm public/temp/*.db3 public/temp/*.ovpn public/mount-temp/*.gz
 echo "Fim da Remocao dos arquivos temporarios"
+echo "Removendo Arquivo Temporario"
+rm public/generated-images/loading-$IMG_FINAL.gz
 echo "--Fim--"

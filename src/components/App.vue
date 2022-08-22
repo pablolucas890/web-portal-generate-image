@@ -116,34 +116,96 @@ export default {
       }
     },
     generateImage() {
-      if (this.preenchido) {
-        this.imageName = this.imageName.replaceAll(' ', '-')
-        this.imageName = this.imageName.replaceAll('/', '-')
-        this.imageName = this.imageName.replaceAll('\\', '-')
-        this.imageName = this.imageName.replaceAll(']', '-')
+      let statusLoading = false;
+      for (let i = 0; i < this.gridData.length; i++) {
+        const element = this.gridData[i];
+        if (element.status == 'loading') {
+          statusLoading = true;
+        }
+      }
+      if (statusLoading) {
+        alert("Espere ate a Finalizacao da geracao Atual")
+      } else {
+        if (this.preenchido) {
+          this.imageName = this.imageName.replaceAll(' ', '-')
+          this.imageName = this.imageName.replaceAll('/', '-')
+          this.imageName = this.imageName.replaceAll('\\', '-')
+          this.imageName = this.imageName.replaceAll(']', '-')
 
-        let imageName = this.imageName + ']' + this.formatDate(new Date()) + ']' + this.selected_image_base + ']' + this.db3File.name + ']' + this.ovpnFile.name;
-        this.Appdb3File === null ? (imageName = imageName) : (this.Appdb3File.name === undefined ? (imageName = imageName) : (imageName += ']' + this.Appdb3File.name))
-        imageName += '].img'
+          let imageName = this.imageName + ']' + this.formatDate(new Date()) + ']' + this.selected_image_base + ']' + this.db3File.name + ']' + this.ovpnFile.name;
+          this.Appdb3File === null ? (imageName = imageName) : (this.Appdb3File.name === undefined ? (imageName = imageName) : (imageName += ']' + this.Appdb3File.name))
+          imageName += '].img'
 
-        this.sendFiles()
+          this.sendFiles()
 
-        fetch(`http://${dataJson.bind}:${dataJson.port}/create-image?image_name=${imageName}`, {
+          fetch(`http://${dataJson.bind}:${dataJson.port}/create-image?image_name=${imageName}`, {
+            method: 'GET',
+            headers: headers,
+          }).then(response => response.json())
+            .then(json => {
+              //Colocar alert de sucesso ou erro
+            });
+          window.location.reload();
+        } else {
+          if (this.$refs.alert.className.includes('2')) {
+            this.$refs.alert.className = 'visible visible-transform'
+          } else {
+            this.$refs.alert.className = 'visible visible-transform2'
+          }
+        }
+      }
+    },
+    showLocaleTime: function () {
+      fetch(`http://${dataJson.bind}:${dataJson.port}/list-generated-images`, {
+        method: 'GET',
+        headers: headers,
+      }).then(response => response.json())
+        .then(json => {
+          time.gridData = []
+          console.log(json)
+          for (let i = 0; i < json.length; i++) {
+            const element = json[i];
+            const celGrid = {
+              nome: element.split(']')[0],
+              data: element.split(']')[1],
+              status: 'download',
+              imagem: element.split(']')[2],
+              db3: element.split(']')[3],
+              ovpn: element.split(']')[4],
+              appdb3: element.split(']')[5] === '.img.gz' ? '' : element.split(']')[5],
+            }
+            time.gridData.push(celGrid)
+          }
+        });
+      var time = this;
+      setInterval(function () {
+        time.localTime = new Date().toLocaleTimeString();
+        fetch(`http://${dataJson.bind}:${dataJson.port}/list-generated-images`, {
           method: 'GET',
           headers: headers,
         }).then(response => response.json())
           .then(json => {
-            //Colocar alert de sucesso ou erro
+            time.gridData = []
+            console.log(json)
+            for (let i = 0; i < json.length; i++) {
+              const element = json[i];
+              const celGrid = {
+                nome: element.split(']')[0],
+                data: element.split(']')[1],
+                status: element.split(']')[0].substring(0, 8) === 'loading-' ? 'loading' : 'download',
+                imagem: element.split(']')[2],
+                db3: element.split(']')[3],
+                ovpn: element.split(']')[4],
+                appdb3: element.split(']')[5] === '.img.gz' ? '' : element.split(']')[5],
+              }
+              time.gridData.push(celGrid)
+            }
           });
-        window.location.reload();
-      } else {
-        if (this.$refs.alert.className.includes('2')) {
-          this.$refs.alert.className = 'visible visible-transform'
-        } else {
-          this.$refs.alert.className = 'visible visible-transform2'
-        }
-      }
-    },
+      }, 5000);
+    }
+  },
+  mounted() {
+    this.showLocaleTime()
   },
   watch: {
     selected_image_base() {
@@ -152,7 +214,6 @@ export default {
   },
   async created() {
     this.listImageBase()
-    this.listGridData()
   },
 }
 </script>
