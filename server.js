@@ -62,25 +62,46 @@ app.post('/upload', upload.array('files', 3), (request, response) => {
     })
 });
 function criaImagem(imgName, imgFullName) {
-    exec(`sudo ./exec.sh ${imgName} ${imgFullName}`, (error, stdout, stderr) => {
+    let offset = 4194304;
+    if(imgName.includes('orange')){
+        offset = 4194304;
+    }else{
+        offset = 250001;
+    }
+    exec(`sudo ./exec.sh ${imgName} ${imgFullName} ${offset}`, (error, stdout, stderr) => {
         if (error) {
             console.log(`Erro: ${error.message}`);
+            exec(`sudo ./clean-errors.sh ${imgFullName}`, (error, stdout, stderr) => {
+                if (error) {
+                    console.log(`Erro: ${error.message}`);
+                }
+                if (stderr) {
+                    console.log(`stderr: ${stderr}`);
+                }
+                console.log('Stdout:', stdout)
+                return;
+            });
         }
         if (stderr) {
             console.log(`stderr: ${stderr}`);
+            exec(`sudo ./clean-errors.sh ${imgFullName}`, (error, stdout, stderr) => {
+                if (error) {
+                    console.log(`Erro: ${error.message}`);
+                }
+                if (stderr) {
+                    console.log(`stderr: ${stderr}`);
+                }
+                console.log('Stdout:', stdout)
+                return;
+            });
         }
         console.log('Stdout:', stdout)
         return;
     });
 }
-function montaImagem(imgFullName, db3FileName, ovpnFileName, appdb3FileName) {
-
-}
 app.get('/create-image', logRequest, (request, response) => {
     const imgFullName = request.query.image_name;
     const imgName = imgFullName.split(']')[2]
-    // Fazer Loading
-    // Fazer Carregamento do DataTable de 5 em 5 segundos
     criaImagem(imgName, imgFullName);
 
     message = "ok"
