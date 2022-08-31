@@ -1,0 +1,9 @@
+*.img
+node_modules
+dist
+*/mounted-img/*
+*.ovpn
+*.db3
+*.gz
+cfg.json
+.vscode

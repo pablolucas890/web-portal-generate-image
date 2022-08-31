@@ -1,0 +1,37 @@
+@import "./base.css";
+@font-face {
+  font-family: avenir-light;
+  src: url('./Avenir-Light.ttf');
+}
+.avenir-light{
+  font-family: avenir-light!important;
+}
+@font-face {
+  font-family: barlow-medium;
+  src: url('./Barlow-Medium.ttf');
+}
+.barlow-medium{
+  font-family: barlow-medium!important;
+}
+.text-blue{
+  color: #0091ea;
+}
+.bg-blue{
+  color: #0091ea;
+}
+body{
+  background-color: rgb(232, 242, 255);
+}
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 5rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  font-weight: normal;
+}
+@media (max-width: 766px) {
+  #app  {
+    padding: .25rem;
+    }
+}
